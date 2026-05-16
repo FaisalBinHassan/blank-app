@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSExtension</key>
+    <dict>
+        <key>NSExtensionAttributes</key>
+        <dict>
+            <!-- Set to YES so the keyboard can make network requests for AI features -->
+            <key>RequestsOpenAccess</key>
+            <true/>
+            <key>IsASCIICapable</key>
+            <false/>
+            <key>PrefersRightToLeft</key>
+            <false/>
+            <key>PrimaryLanguage</key>
+            <string>en-US</string>
+        </dict>
+        <key>NSExtensionPointIdentifier</key>
+        <string>com.apple.keyboard-service</string>
+        <!-- IMPORTANT: Change "KeyboardExtension" below to your actual module name -->
+        <key>NSPrincipalClass</key>
+        <string>KeyboardExtension.KeyboardViewController</string>
+    </dict>
+</dict>
+</plist>
