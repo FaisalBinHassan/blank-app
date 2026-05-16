@@ -1,0 +1,101 @@
+name: Build KeyboardAI IPA
+
+# Runs on every push to the feature branch, or manually via the Actions tab
+on:
+  push:
+    branches:
+      - main
+      - "claude/ios-keyboard-ai*"
+    paths:
+      - "ios-keyboard-ai/**"
+      - "project.yml"
+      - ".github/workflows/build-ios.yml"
+  workflow_dispatch:   # lets you click "Run workflow" in the GitHub UI anytime
+
+jobs:
+  build:
+    name: Build & export IPA
+    runs-on: macos-14   # Apple Silicon runner — fastest free macOS option
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ── 2. Select Xcode version ──────────────────────────────────────────
+      - name: Select Xcode 15.4
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      # ── 3. Install XcodeGen ──────────────────────────────────────────────
+      # XcodeGen creates the .xcodeproj from project.yml so we never need to
+      # commit binary Xcode project files.
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      # ── 4. Replace bundle ID placeholders ────────────────────────────────
+      # The repo ships with "com.yourdomain" as placeholder.
+      # Set BUNDLE_ID_PREFIX in your repo's Settings → Secrets and variables
+      # → Actions → Variables (not Secrets, these are not sensitive).
+      - name: Patch bundle IDs
+        env:
+          PREFIX: ${{ vars.BUNDLE_ID_PREFIX || 'com.yourdomain' }}
+        run: |
+          sed -i '' "s/com\.yourdomain/$PREFIX/g" project.yml
+          sed -i '' "s/com\.yourdomain/$PREFIX/g" ios-keyboard-ai/MainApp/KeyboardAI.entitlements
+          sed -i '' "s/com\.yourdomain/$PREFIX/g" ios-keyboard-ai/KeyboardExtension/KeyboardExtension.entitlements
+          sed -i '' "s/com\.yourdomain/$PREFIX/g" ios-keyboard-ai/Shared/Constants.swift
+          sed -i '' "s/com\.yourdomain/$PREFIX/g" ios-keyboard-ai/KeyboardExtension/Info.plist
+
+      # ── 5. Generate Xcode project ─────────────────────────────────────────
+      - name: Generate .xcodeproj
+        run: xcodegen generate
+
+      # ── 6. Build (no signing — AltStore/Sideloadly signs on install) ──────
+      # We build a .app bundle then package it as an IPA manually.
+      # This unsigned IPA is then signed by AltStore/Sideloadly on your device.
+      - name: Build app (unsigned)
+        run: |
+          xcodebuild \
+            -project KeyboardAI.xcodeproj \
+            -scheme KeyboardAI \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            -derivedDataPath DerivedData \
+            build \
+            | xcpretty --color || true
+
+      # ── 7. Package as .ipa ────────────────────────────────────────────────
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r DerivedData/Build/Products/Release-iphoneos/KeyboardAI.app Payload/
+          zip -r KeyboardAI-unsigned.ipa Payload
+          echo "IPA size: $(du -sh KeyboardAI-unsigned.ipa | cut -f1)"
+
+      # ── 8. Upload IPA as artifact ─────────────────────────────────────────
+      # Go to your repo on GitHub → Actions → this run → download the artifact.
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeyboardAI-unsigned-${{ github.sha }}
+          path: KeyboardAI-unsigned.ipa
+          retention-days: 30   # keeps the IPA for 30 days
+
+      # ── 9. Build summary ──────────────────────────────────────────────────
+      - name: Summary
+        run: |
+          echo "## ✅ Build complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download **KeyboardAI-unsigned.ipa** from the Artifacts section above." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Install options" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Platform | Re-sign needed |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **AltStore** | iPhone (via AltServer on Windows/Mac) | Every 7 days — automatic |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Sideloadly** | Windows or Mac | Every 7 days — manual |" >> $GITHUB_STEP_SUMMARY
+          echo "| **TrollStore** *(iOS 14–16.6.1 only)* | Direct on iPhone | Never |" >> $GITHUB_STEP_SUMMARY
