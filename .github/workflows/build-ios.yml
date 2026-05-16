@@ -50,34 +50,49 @@ jobs:
       - name: Generate .xcodeproj
         run: xcodegen generate
 
-      # ── 6. Build (no signing — AltStore/Sideloadly signs on install) ──────
-      # We build a .app bundle then package it as an IPA manually.
-      # This unsigned IPA is then signed by AltStore/Sideloadly on your device.
+      # ── 6. List available schemes (debug) ────────────────────────────────
+      - name: List schemes
+        run: xcodebuild -project KeyboardAI.xcodeproj -list
+
+      # ── 7. Build (no signing — AltStore/Sideloadly signs on install) ──────
       - name: Build app (unsigned)
         run: |
+          set -o pipefail
           xcodebuild \
             -project KeyboardAI.xcodeproj \
             -scheme KeyboardAI \
             -configuration Release \
             -sdk iphoneos \
-            -destination generic/platform=iOS \
+            -destination "generic/platform=iOS" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             ONLY_ACTIVE_ARCH=NO \
             -derivedDataPath DerivedData \
-            build \
-            | xcpretty --color || true
+            build 2>&1 | tee build.log
+          echo "--- Build exit code: $?"
 
-      # ── 7. Package as .ipa ────────────────────────────────────────────────
+      # ── 8. Find the built .app ────────────────────────────────────────────
+      - name: Locate .app
+        run: |
+          echo "=== Searching DerivedData for .app ==="
+          find DerivedData -name "*.app" -type d 2>/dev/null || echo "No .app bundles found"
+
+      # ── 9. Package as .ipa ────────────────────────────────────────────────
       - name: Package IPA
         run: |
+          APP_PATH=$(find DerivedData -name "KeyboardAI.app" -type d | grep -v ".xctest" | head -1)
+          if [ -z "$APP_PATH" ]; then
+            echo "ERROR: KeyboardAI.app not found. Build likely failed — check build.log above."
+            exit 1
+          fi
+          echo "Packaging: $APP_PATH"
           mkdir -p Payload
-          cp -r DerivedData/Build/Products/Release-iphoneos/KeyboardAI.app Payload/
+          cp -r "$APP_PATH" Payload/
           zip -r KeyboardAI-unsigned.ipa Payload
           echo "IPA size: $(du -sh KeyboardAI-unsigned.ipa | cut -f1)"
 
-      # ── 8. Upload IPA as artifact ─────────────────────────────────────────
+      # ── 10. Upload IPA as artifact ────────────────────────────────────────
       # Go to your repo on GitHub → Actions → this run → download the artifact.
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -86,7 +101,7 @@ jobs:
           path: KeyboardAI-unsigned.ipa
           retention-days: 30   # keeps the IPA for 30 days
 
-      # ── 9. Build summary ──────────────────────────────────────────────────
+      # ── 11. Build summary ─────────────────────────────────────────────────
       - name: Summary
         run: |
           echo "## ✅ Build complete" >> $GITHUB_STEP_SUMMARY
