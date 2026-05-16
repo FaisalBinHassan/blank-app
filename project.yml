@@ -20,7 +20,8 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     MARKETING_VERSION: "1.0.0"
     CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""          # CI injects this via env var / secrets
+    DEVELOPMENT_TEAM: ""
+    SWIFT_STRICT_CONCURRENCY: minimal
 
 # ── Targets ────────────────────────────────────────────────────────────────
 

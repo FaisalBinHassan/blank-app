@@ -1,10 +1,10 @@
-import UIKit
+@preconcurrency import UIKit
 import SwiftUI
 
 @MainActor
 final class KeyboardViewModel: ObservableObject {
     // Injected by the view controller
-    weak var inputViewController: UIInputViewController?
+    var inputViewController: UIInputViewController?
 
     // State
     @Published var isProcessing = false

@@ -1,6 +1,6 @@
 import Foundation
 
-actor AIService {
+final class AIService {
     static let shared = AIService()
     private init() {}
 
