@@ -21,6 +21,8 @@ jobs:
       # ── 1. Checkout ──────────────────────────────────────────────────────
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: claude/ios-keyboard-ai-extension-y1znj
 
       # ── 2. Select latest Xcode ───────────────────────────────────────────
       - name: Select Xcode
