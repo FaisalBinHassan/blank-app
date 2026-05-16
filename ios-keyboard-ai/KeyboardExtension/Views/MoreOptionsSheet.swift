@@ -7,31 +7,8 @@ struct MoreOptionsSheet: View {
     var body: some View {
         NavigationView {
             List {
-                // Context picker at the top
-                Section("Context") {
-                    Picker("Style", selection: Binding(
-                        get: { viewModel.selectedContext },
-                        set: { viewModel.selectedContext = $0 }
-                    )) {
-                        ForEach(MessageContext.allCases) { ctx in
-                            Label(ctx.displayName, systemImage: ctx.icon).tag(ctx)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                }
-
-                // All transformation sections
-                ForEach(TransformationSection.all, id: \.title) { section in
-                    Section(section.title) {
-                        ForEach(section.options) { option in
-                            if option == .customPrompt {
-                                customPromptRow
-                            } else {
-                                transformRow(option: option)
-                            }
-                        }
-                    }
-                }
+                contextSection
+                transformationSections
             }
             .navigationTitle("AI Actions")
             .navigationBarTitleDisplayMode(.inline)
@@ -43,6 +20,39 @@ struct MoreOptionsSheet: View {
         }
     }
 
+    private var contextSection: some View {
+        Section("Context") {
+            Picker("Style", selection: Binding(
+                get: { viewModel.selectedContext },
+                set: { viewModel.selectedContext = $0 }
+            )) {
+                ForEach(MessageContext.allCases) { ctx in
+                    Label(ctx.displayName, systemImage: ctx.icon).tag(ctx)
+                }
+            }
+            .pickerStyle(.menu)
+        }
+    }
+
+    private var transformationSections: some View {
+        ForEach(TransformationSection.all, id: \.title) { section in
+            Section(section.title) {
+                ForEach(section.options) { option in
+                    sheetRow(option)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func sheetRow(_ option: TransformationOption) -> some View {
+        if option == .customPrompt {
+            customPromptRow
+        } else {
+            transformRow(option)
+        }
+    }
+
     private func transformRow(_ option: TransformationOption) -> some View {
         Button {
             dismiss()
@@ -50,17 +60,7 @@ struct MoreOptionsSheet: View {
                 viewModel.transform(option: option)
             }
         } label: {
-            HStack {
-                Text(option.icon)
-                    .font(.title3)
-                    .frame(width: 32)
-                Text(option.displayName)
-                    .foregroundColor(.primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            rowLabel(icon: option.icon, title: option.displayName)
         }
     }
 
@@ -71,17 +71,21 @@ struct MoreOptionsSheet: View {
                 viewModel.showCustomPrompt = true
             }
         } label: {
-            HStack {
-                Text("💡")
-                    .font(.title3)
-                    .frame(width: 32)
-                Text("Custom Prompt…")
-                    .foregroundColor(.primary)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            rowLabel(icon: "💡", title: "Custom Prompt…")
+        }
+    }
+
+    private func rowLabel(icon: String, title: String) -> some View {
+        HStack {
+            Text(icon)
+                .font(.title3)
+                .frame(width: 32)
+            Text(title)
+                .foregroundColor(.primary)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
     }
 }
@@ -106,38 +110,8 @@ struct CustomPromptSheet: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Describe what you want to do with your text:")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
-
-                TextField("e.g. Make it sound more confident", text: $viewModel.customPromptText, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(3...6)
-                    .focused($isFocused)
-                    .padding(.horizontal)
-
-                Text("Suggestions")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal)
-
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        ForEach(suggestions, id: \.self) { suggestion in
-                            Button(suggestion) {
-                                viewModel.customPromptText = suggestion
-                            }
-                            .font(.caption)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color(.secondarySystemBackground))
-                            .clipShape(Capsule())
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-
+                inputSection
+                suggestionsSection
                 Spacer()
             }
             .padding(.top)
@@ -163,5 +137,49 @@ struct CustomPromptSheet: View {
             }
         }
         .onAppear { isFocused = true }
+    }
+
+    private var inputSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Describe what you want to do with your text:")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+
+            TextField("e.g. Make it sound more confident", text: $viewModel.customPromptText, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+                .lineLimit(3...6)
+                .focused($isFocused)
+                .padding(.horizontal)
+        }
+    }
+
+    private var suggestionsSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Suggestions")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(suggestions, id: \.self) { suggestion in
+                        suggestionButton(suggestion)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+
+    private func suggestionButton(_ title: String) -> some View {
+        Button(title) {
+            viewModel.customPromptText = title
+        }
+        .font(.caption)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(Capsule())
     }
 }
