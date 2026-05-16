@@ -6,187 +6,187 @@
 <title>KeyboardAI — Preview</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     background: #1c1c1e;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-    padding: 24px;
+    padding: 24px 16px 48px;
+    gap: 18px;
   }
 
-  h1 {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    letter-spacing: -0.3px;
-  }
+  h1 { color: #fff; font-size: 17px; font-weight: 600; }
 
-  /* ── Phone shell ─────────────────────────────────── */
+  /* ── State tabs ─────────────────────────────────────── */
+  .state-tabs {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .state-tab {
+    background: #2c2c2e;
+    color: #ebebf5;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s;
+    user-select: none;
+  }
+  .state-tab:hover { background: #3a3a3c; }
+  .state-tab.active { background: #007aff; color: #fff; }
+
+  /* ── Phone shell ────────────────────────────────────── */
   .phone {
-    width: 390px;
+    width: 100%;
+    max-width: 390px;
     background: #000;
-    border-radius: 54px;
-    padding: 12px;
-    box-shadow: 0 0 0 2px #3a3a3c, 0 30px 80px rgba(0,0,0,.7);
-    position: relative;
+    border-radius: 52px;
+    padding: 11px;
+    box-shadow: 0 0 0 2px #3a3a3c, 0 28px 70px rgba(0,0,0,.8);
   }
   .phone-inner {
-    background: #fff;
-    border-radius: 44px;
-    overflow: hidden;
-    position: relative;
+    background: #f2f2f7;
+    border-radius: 42px;
+    overflow: hidden; /* clips the rounded corners only — overlays use position:fixed so they still escape */
   }
 
   /* Dynamic island */
   .dynamic-island {
-    width: 126px; height: 36px;
+    width: 118px; height: 34px;
     background: #000;
     border-radius: 20px;
-    margin: 12px auto 0;
-    display: block;
+    margin: 11px auto 0;
   }
 
-  /* ── App screen ──────────────────────────────────── */
+  /* ── Chat screen ────────────────────────────────────── */
   .screen {
-    padding: 12px 16px 0;
-    min-height: 200px;
+    background: #fff;
+    padding: 10px 14px 0;
   }
   .app-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 0 10px;
+    padding-bottom: 8px;
   }
-  .app-bar-title { font-size: 17px; font-weight: 600; color: #000; }
+  .app-bar-title { font-size: 16px; font-weight: 600; }
+  .back { font-size: 22px; color: #007aff; line-height: 1; }
+  .more { font-size: 22px; color: #007aff; line-height: 1; }
+
   .contact-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e5e5ea;
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid #e5e5ea;
   }
   .avatar {
-    width: 36px; height: 36px;
+    width: 34px; height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #5e5ce6, #bf5af2);
+    background: linear-gradient(135deg,#5e5ce6,#bf5af2);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 14px; font-weight: 700;
+    flex-shrink: 0;
   }
-  .contact-name { font-size: 13px; font-weight: 600; color: #000; }
+  .contact-name { font-size: 13px; font-weight: 600; }
   .contact-status { font-size: 11px; color: #8e8e93; }
 
-  /* Chat bubbles */
-  .messages { padding: 12px 0; display: flex; flex-direction: column; gap: 6px; }
+  .messages { padding: 10px 0 6px; display: flex; flex-direction: column; gap: 5px; }
   .bubble {
-    max-width: 75%;
-    padding: 8px 12px;
-    border-radius: 18px;
+    max-width: 76%;
+    padding: 7px 11px;
+    border-radius: 17px;
     font-size: 14px;
     line-height: 1.4;
   }
-  .bubble.received {
-    background: #e5e5ea;
-    color: #000;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-  }
-  .bubble.sent {
-    background: #007aff;
-    color: #fff;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-  }
+  .bubble.recv { background: #e5e5ea; color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
+  .bubble.sent { background: #007aff; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-  /* Text input row */
   .text-input-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    padding: 8px 0 10px;
+    display: flex; align-items: flex-end; gap: 8px;
+    padding: 7px 0 9px;
   }
   .text-box {
     flex: 1;
     border: 1.5px solid #d1d1d6;
-    border-radius: 20px;
-    padding: 8px 14px;
+    border-radius: 18px;
+    padding: 7px 12px;
     font-size: 14px;
-    color: #000;
-    min-height: 36px;
+    min-height: 34px;
     line-height: 1.4;
-    background: #fff;
-    cursor: text;
-    position: relative;
+    word-break: break-word;
   }
-  .text-box .cursor {
+  .cursor {
     display: inline-block;
-    width: 2px;
-    height: 14px;
+    width: 2px; height: 14px;
     background: #007aff;
     vertical-align: text-bottom;
-    animation: blink 1s step-end infinite;
     margin-left: 1px;
+    animation: blink 1s step-end infinite;
   }
   @keyframes blink { 50% { opacity: 0; } }
   .send-btn {
-    width: 32px; height: 32px;
-    background: #007aff;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    background: #007aff; border: none; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
   .send-btn svg { fill: #fff; }
 
-  /* ── Keyboard ────────────────────────────────────── */
-  .keyboard {
-    background: #d1d5db;
-    padding-bottom: 8px;
-  }
+  /* ── Keyboard ───────────────────────────────────────── */
+  .keyboard { background: #d1d5db; }
 
-  /* AI action bar */
+  /* ─ AI bar ── two-row chip grid, always fully visible */
   .ai-bar {
     background: #f2f2f7;
     border-bottom: 0.5px solid #c6c6c8;
-    height: 44px;
+    padding: 6px 10px;
     display: flex;
-    align-items: center;
-    overflow-x: auto;
-    scrollbar-width: none;
-    gap: 6px;
-    padding: 0 10px;
-    position: relative;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 44px;
+    justify-content: center;
   }
-  .ai-bar::-webkit-scrollbar { display: none; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
 
   .chip {
     white-space: nowrap;
     background: #e5e5ea;
     border: none;
     border-radius: 8px;
-    padding: 5px 10px;
+    padding: 5px 9px;
     font-size: 12px;
     font-weight: 500;
     color: #000;
     cursor: pointer;
-    transition: all .12s ease;
     font-family: inherit;
-    flex-shrink: 0;
+    transition: all .1s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  .chip:hover { background: #d1d1d6; transform: scale(0.97); }
-  .chip:active { transform: scale(0.93); }
-  .chip.blue { background: #007aff; color: #fff; }
+  .chip:hover  { background: #d1d1d6; }
+  .chip:active { transform: scale(.93); background: #c7c7cc; }
+  .chip.blue   { background: #007aff; color: #fff; }
   .chip.blue:hover { background: #0066d6; }
-  .chip.divider { width: 0.5px; height: 22px; background: #c6c6c8; padding: 0; cursor: default; }
-  .chip.divider:hover { transform: none; background: #c6c6c8; }
+  .chip.blue:active { background: #005bb5; }
 
-  /* Processing state */
-  .ai-bar.processing .chips-row { display: none; }
-  .ai-bar .processing-row { display: none; align-items: center; gap: 8px; width: 100%; padding: 0 4px; }
-  .ai-bar.processing .processing-row { display: flex; }
+  .chip-divider { width: 0.5px; height: 18px; background: #c6c6c8; }
+
+  /* Processing strip */
+  .ai-processing {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0;
+  }
   .spinner {
     width: 16px; height: 16px;
     border: 2px solid #d1d1d6;
@@ -197,300 +197,211 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .processing-text { font-size: 13px; color: #8e8e93; flex: 1; }
-  .cancel-btn { font-size: 13px; color: #007aff; cursor: pointer; background: none; border: none; font-family: inherit; }
+  .cancel-btn {
+    font-size: 13px; color: #007aff;
+    background: none; border: none; cursor: pointer; font-family: inherit;
+  }
 
-  /* Emoji strip */
-  .emoji-strip { display: none; align-items: center; gap: 8px; width: 100%; }
-  .ai-bar.emoji .chips-row { display: none; }
-  .ai-bar.emoji .emoji-strip { display: flex; }
-  .emoji-strip span { font-size: 11px; color: #8e8e93; flex-shrink: 0; }
+  /* Emoji suggestion strip */
+  .emoji-strip {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .emoji-strip::-webkit-scrollbar { display: none; }
+  .emoji-strip .strip-label { font-size: 11px; color: #8e8e93; flex-shrink: 0; }
   .emoji-btn {
-    font-size: 22px;
-    cursor: pointer;
-    background: none;
-    border: none;
+    font-size: 22px; cursor: pointer;
+    background: none; border: none;
     padding: 0 2px;
     transition: transform .1s;
-  }
-  .emoji-btn:hover { transform: scale(1.2); }
-  .close-emoji {
-    margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #8e8e93;
-    cursor: pointer;
     flex-shrink: 0;
   }
+  .emoji-btn:hover { transform: scale(1.2); }
+  .close-strip {
+    margin-left: auto; background: none; border: none;
+    font-size: 16px; color: #8e8e93; cursor: pointer; flex-shrink: 0;
+  }
 
-  .chips-row { display: flex; align-items: center; gap: 6px; }
-
-  /* QWERTY rows */
-  .key-rows { padding: 8px 4px 4px; display: flex; flex-direction: column; gap: 8px; }
-  .key-row { display: flex; justify-content: center; gap: 5px; }
-  .key-row.row2 { padding: 0 18px; }
-  .key-row.row3 { padding: 0 0; }
-  .key-row.row4 { padding: 0 4px; }
+  /* ─ Keys ── */
+  .key-rows { padding: 8px 3px 4px; display: flex; flex-direction: column; gap: 7px; }
+  .key-row   { display: flex; justify-content: center; gap: 5px; }
 
   .key {
     background: #fff;
     border: none;
     border-radius: 5px;
-    box-shadow: 0 1px 0 rgba(0,0,0,.3);
+    box-shadow: 0 1px 0 rgba(0,0,0,.32);
     font-size: 17px;
-    font-weight: 400;
     color: #000;
     cursor: pointer;
     height: 42px;
-    min-width: 32px;
     flex: 1;
-    max-width: 36px;
+    max-width: 34px;
     display: flex; align-items: center; justify-content: center;
-    transition: all .06s ease;
     font-family: inherit;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .06s;
   }
-  .key:active { background: #e5e5ea; transform: scale(0.93); }
+  .key:active { background: #e5e5ea; }
 
   .key.fn {
     background: #adb5bd;
-    font-size: 13px;
-    font-weight: 500;
-    color: #000;
+    font-size: 13px; font-weight: 500;
     max-width: none;
   }
-  .key.fn.shift { flex: 1.5; max-width: 48px; }
-  .key.fn.delete { flex: 1.5; max-width: 48px; }
-  .key.fn.num { flex: 2; max-width: none; font-size: 14px; }
-  .key.fn.globe { flex: 1; max-width: 36px; }
-  .key.fn.mic { flex: 1; max-width: 36px; }
-  .key.fn.return-key { flex: 2; max-width: none; font-size: 14px; }
-  .key.space { flex: 4; max-width: none; font-size: 14px; color: #3c3c43; }
-  .key.shift-active { background: #fff; }
+  .key.fn.wide  { flex: 1.6; }
+  .key.fn.wider { flex: 2.2; }
+  .key.space    { flex: 5; max-width: none; font-size: 14px; color: #3c3c43; background: #fff; }
+  .key.fn.active-shift { background: #fff; color: #007aff; }
 
-  /* ── Overlays ─────────────────────────────────────── */
+  /* Home indicator */
+  .home-indicator { height: 30px; display: flex; align-items: center; justify-content: center; background: #d1d5db; }
+  .home-bar { width: 120px; height: 5px; background: #000; border-radius: 3px; opacity: .2; }
+
+  /* ── Overlay + Sheet ─────────────────────────────────── */
   .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.5);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.48);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 200;
+    opacity: 0; pointer-events: none;
+    transition: opacity .22s;
   }
-  .overlay.visible { opacity: 1; pointer-events: all; }
+  .overlay.open { opacity: 1; pointer-events: all; }
 
   .sheet {
     background: #f2f2f7;
-    border-radius: 12px 12px 0 0;
-    width: 100%;
-    max-width: 390px;
-    padding: 0 0 32px;
-    transform: translateY(30px);
+    border-radius: 14px 14px 0 0;
+    width: 100%; max-width: 450px;
+    max-height: 80vh;
+    display: flex; flex-direction: column;
+    transform: translateY(24px);
     transition: transform .25s cubic-bezier(.4,0,.2,1);
-    max-height: 70vh;
-    overflow-y: auto;
   }
-  .overlay.visible .sheet { transform: translateY(0); }
+  .overlay.open .sheet { transform: translateY(0); }
 
   .sheet-handle {
     width: 36px; height: 5px;
-    background: #d1d1d6;
-    border-radius: 3px;
-    margin: 10px auto 4px;
+    background: #d1d1d6; border-radius: 3px;
+    margin: 10px auto 0; flex-shrink: 0;
   }
   .sheet-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px 10px;
     border-bottom: 0.5px solid #d1d1d6;
+    flex-shrink: 0;
   }
   .sheet-title { font-size: 17px; font-weight: 600; }
   .sheet-done {
-    font-size: 17px;
-    font-weight: 600;
-    color: #007aff;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
+    font-size: 17px; font-weight: 600; color: #007aff;
+    background: none; border: none; cursor: pointer; font-family: inherit;
   }
 
+  /* Scrollable body of sheet */
+  .sheet-body { overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+
   .sheet-section-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: #8e8e93;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    padding: 16px 16px 6px;
+    font-size: 12px; font-weight: 600; color: #8e8e93;
+    text-transform: uppercase; letter-spacing: .5px;
+    padding: 14px 16px 6px;
   }
   .sheet-group {
-    background: #fff;
-    border-radius: 10px;
-    margin: 0 16px 4px;
-    overflow: hidden;
+    background: #fff; border-radius: 10px;
+    margin: 0 16px 4px; overflow: hidden;
   }
   .sheet-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 14px;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    cursor: pointer;
-    font-family: inherit;
+    display: flex; align-items: center;
+    padding: 13px 14px;
+    border: none; background: none; width: 100%;
+    text-align: left; cursor: pointer; font-family: inherit;
     border-bottom: 0.5px solid #e5e5ea;
     gap: 10px;
+    -webkit-tap-highlight-color: transparent;
     transition: background .1s;
   }
   .sheet-item:last-child { border-bottom: none; }
-  .sheet-item:hover { background: #f5f5f5; }
-  .sheet-item-icon { font-size: 20px; width: 28px; text-align: center; }
-  .sheet-item-label { font-size: 15px; color: #000; flex: 1; }
-  .sheet-item-arrow { font-size: 13px; color: #c7c7cc; }
+  .sheet-item:hover  { background: #f5f5f5; }
+  .sheet-item:active { background: #e5e5ea; }
+  .item-icon  { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+  .item-label { font-size: 15px; color: #000; flex: 1; }
+  .item-arrow { font-size: 13px; color: #c7c7cc; }
 
-  .context-bar {
-    display: flex;
-    gap: 8px;
-    padding: 10px 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  /* Context chips inside sheet */
+  .ctx-row {
+    display: flex; gap: 7px; flex-wrap: wrap;
+    padding: 8px 16px 12px;
   }
-  .context-bar::-webkit-scrollbar { display: none; }
   .ctx-chip {
-    white-space: nowrap;
-    background: #e5e5ea;
-    border: none;
-    border-radius: 16px;
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: inherit;
-    color: #000;
-    transition: all .1s;
+    background: #e5e5ea; border: none; border-radius: 16px;
+    padding: 6px 12px; font-size: 13px;
+    cursor: pointer; font-family: inherit; color: #000;
+    transition: background .1s;
+    user-select: none;
   }
+  .ctx-chip:hover  { background: #d1d1d6; }
+  .ctx-chip:active { background: #c7c7cc; }
   .ctx-chip.active { background: #007aff; color: #fff; }
-  .ctx-chip:hover { background: #d1d1d6; }
   .ctx-chip.active:hover { background: #0066d6; }
 
-  /* Custom prompt sheet */
+  /* Prompt sheet */
+  .prompt-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .prompt-hint { font-size: 14px; color: #8e8e93; }
   .prompt-textarea {
-    width: 100%;
-    border: 1.5px solid #007aff;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 15px;
-    font-family: inherit;
-    resize: none;
-    outline: none;
-    min-height: 80px;
-    color: #000;
-    background: #fff;
+    width: 100%; border: 1.5px solid #007aff; border-radius: 10px;
+    padding: 10px 12px; font-size: 15px; font-family: inherit;
+    resize: none; outline: none; min-height: 80px; color: #000;
   }
-  .prompt-input-wrap { padding: 0 16px; }
-  .suggestions-title { font-size: 12px; color: #8e8e93; padding: 10px 16px 6px; }
-  .suggestions-row {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 0 16px 12px;
-    scrollbar-width: none;
-  }
-  .suggestions-row::-webkit-scrollbar { display: none; }
+  .sug-title { font-size: 12px; color: #8e8e93; }
+  .sug-row { display: flex; flex-wrap: wrap; gap: 7px; }
   .sug-chip {
-    white-space: nowrap;
-    background: #e5e5ea;
-    border: none;
-    border-radius: 14px;
-    padding: 6px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    font-family: inherit;
-    color: #000;
+    background: #e5e5ea; border: none; border-radius: 14px;
+    padding: 6px 11px; font-size: 12px;
+    cursor: pointer; font-family: inherit; color: #000;
     transition: background .1s;
   }
-  .sug-chip:hover { background: #d1d1d6; }
+  .sug-chip:hover  { background: #d1d1d6; }
+  .sug-chip:active { background: #c7c7cc; }
   .apply-btn {
-    display: block;
-    margin: 8px 16px 0;
-    width: calc(100% - 32px);
-    padding: 14px;
-    background: #007aff;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background .1s;
+    padding: 14px; background: #007aff; color: #fff;
+    border: none; border-radius: 12px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: background .1s; margin-top: 4px;
   }
-  .apply-btn:hover { background: #0066d6; }
-
-  /* Home indicator */
-  .home-indicator {
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .home-bar {
-    width: 134px; height: 5px;
-    background: #000;
-    border-radius: 3px;
-    opacity: .2;
-  }
-
-  /* State labels */
-  .state-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .state-tab {
-    background: #2c2c2e;
-    color: #ebebf5;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all .15s;
-  }
-  .state-tab:hover { background: #3a3a3c; }
-  .state-tab.active { background: #007aff; color: #fff; }
+  .apply-btn:hover  { background: #0066d6; }
+  .apply-btn:active { background: #005bb5; }
+  .apply-btn:disabled { background: #aaa; cursor: default; }
 </style>
 </head>
 <body>
 
 <h1>KeyboardAI — Interactive Preview</h1>
 
+<!-- State tabs -->
 <div class="state-tabs">
-  <button class="state-tab active" onclick="setState('default')">Default</button>
-  <button class="state-tab" onclick="setState('processing')">AI Processing</button>
-  <button class="state-tab" onclick="setState('emoji')">Emoji Strip</button>
-  <button class="state-tab" onclick="setState('more')">More Options</button>
-  <button class="state-tab" onclick="setState('prompt')">Custom Prompt</button>
+  <button class="state-tab active"  onclick="setState('default',this)">Default</button>
+  <button class="state-tab"         onclick="setState('processing',this)">AI Processing</button>
+  <button class="state-tab"         onclick="setState('emoji',this)">Emoji Strip</button>
+  <button class="state-tab"         onclick="openSheet('moreOverlay',this)">More Options</button>
+  <button class="state-tab"         onclick="openSheet('promptOverlay',this)">Custom Prompt</button>
 </div>
 
+<!-- Phone -->
 <div class="phone">
   <div class="phone-inner">
+
     <div class="dynamic-island"></div>
 
-    <!-- App screen -->
+    <!-- Chat screen -->
     <div class="screen">
       <div class="app-bar">
-        <span style="font-size:22px; color:#007aff">‹</span>
+        <span class="back">‹</span>
         <span class="app-bar-title">Sarah</span>
-        <span style="font-size:22px; color:#007aff">⋯</span>
+        <span class="more">⋯</span>
       </div>
       <div class="contact-row">
         <div class="avatar">S</div>
@@ -499,11 +410,11 @@
           <div class="contact-status">Active now</div>
         </div>
       </div>
-      <div class="messages">
-        <div class="bubble received">Hey! Are you still coming to the meeting tomorrow at 3pm?</div>
-        <div class="bubble received">Also can you bring the Q3 report? 📊</div>
+      <div class="messages" id="messages">
+        <div class="bubble recv">Hey! Are you still coming to the meeting tomorrow at 3pm?</div>
+        <div class="bubble recv">Also can you bring the Q3 report? 📊</div>
         <div class="bubble sent">Yes totally! See you then</div>
-        <div class="bubble received">Great! Also want to grab coffee before?</div>
+        <div class="bubble recv">Great! Also want to grab coffee before?</div>
       </div>
       <div class="text-input-row">
         <div class="text-box" id="textBox">
@@ -518,31 +429,31 @@
     <!-- Keyboard -->
     <div class="keyboard">
 
-      <!-- AI bar (multi-state) -->
+      <!-- AI bar -->
       <div class="ai-bar" id="aiBar">
 
-        <!-- Default chips -->
-        <div class="chips-row" id="chipsRow">
+        <!-- Default chips — two wrapped rows so everything is always reachable -->
+        <div class="chip-row" id="chipsDefault">
           <button class="chip" onclick="applyTransform('Rewrite')">✍️ Rewrite</button>
           <button class="chip" onclick="applyTransform('Paraphrase')">🔄 Paraphrase</button>
           <button class="chip" onclick="applyTransform('Fix Grammar')">✅ Fix Grammar</button>
           <button class="chip" onclick="applyTransform('Summarize')">📝 Summarize</button>
-          <div class="chip divider"></div>
-          <button class="chip blue" onclick="showMore()">⚙️ More</button>
-          <button class="chip" onclick="showPrompt()">💡 Prompt</button>
-          <button class="chip" onclick="cycleContext()">📍 <span id="ctxLabel">General</span></button>
+          <div class="chip-divider"></div>
+          <button class="chip blue" onclick="openSheet('moreOverlay',null)">⚙️ More</button>
+          <button class="chip"      onclick="openSheet('promptOverlay',null)">💡 Prompt</button>
+          <button class="chip"      onclick="cycleContext()" id="ctxChip">📍 General</button>
         </div>
 
         <!-- Processing -->
-        <div class="processing-row" id="processingRow">
+        <div class="ai-processing" id="processingRow">
           <div class="spinner"></div>
-          <span class="processing-text">Thinking…</span>
-          <button class="cancel-btn" onclick="setState('default')">Cancel</button>
+          <span class="processing-text" id="processingLabel">Thinking…</span>
+          <button class="cancel-btn" onclick="setState('default',null)">Cancel</button>
         </div>
 
         <!-- Emoji strip -->
         <div class="emoji-strip" id="emojiStrip">
-          <span>Insert:</span>
+          <span class="strip-label">Insert:</span>
           <button class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
           <button class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
           <button class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
@@ -550,12 +461,14 @@
           <button class="emoji-btn" onclick="insertEmoji('📊')">📊</button>
           <button class="emoji-btn" onclick="insertEmoji('✅')">✅</button>
           <button class="emoji-btn" onclick="insertEmoji('🙌')">🙌</button>
-          <button class="close-emoji" onclick="setState('default')">✕</button>
+          <button class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
+          <button class="close-strip" onclick="setState('default',null)">✕</button>
         </div>
-      </div>
 
-      <!-- QWERTY keys -->
-      <div class="key-rows" id="keyRows">
+      </div><!-- /ai-bar -->
+
+      <!-- QWERTY -->
+      <div class="key-rows">
         <div class="key-row">
           <button class="key" onclick="typeKey('q')">q</button>
           <button class="key" onclick="typeKey('w')">w</button>
@@ -568,7 +481,7 @@
           <button class="key" onclick="typeKey('o')">o</button>
           <button class="key" onclick="typeKey('p')">p</button>
         </div>
-        <div class="key-row row2">
+        <div class="key-row" style="padding: 0 16px;">
           <button class="key" onclick="typeKey('a')">a</button>
           <button class="key" onclick="typeKey('s')">s</button>
           <button class="key" onclick="typeKey('d')">d</button>
@@ -579,32 +492,34 @@
           <button class="key" onclick="typeKey('k')">k</button>
           <button class="key" onclick="typeKey('l')">l</button>
         </div>
-        <div class="key-row row3">
-          <button class="key fn shift" id="shiftKey" onclick="toggleShift()">⇧</button>
-          <button class="key" onclick="typeKey('z')" id="k-z">z</button>
-          <button class="key" onclick="typeKey('x')" id="k-x">x</button>
-          <button class="key" onclick="typeKey('c')" id="k-c">c</button>
-          <button class="key" onclick="typeKey('v')" id="k-v">v</button>
-          <button class="key" onclick="typeKey('b')" id="k-b">b</button>
-          <button class="key" onclick="typeKey('n')" id="k-n">n</button>
-          <button class="key" onclick="typeKey('m')" id="k-m">m</button>
-          <button class="key fn delete" onclick="deleteLast()">⌫</button>
+        <div class="key-row">
+          <button class="key fn wide" id="shiftKey" onclick="toggleShift()">⇧</button>
+          <button class="key" id="k-z" onclick="typeKey('z')">z</button>
+          <button class="key" id="k-x" onclick="typeKey('x')">x</button>
+          <button class="key" id="k-c" onclick="typeKey('c')">c</button>
+          <button class="key" id="k-v" onclick="typeKey('v')">v</button>
+          <button class="key" id="k-b" onclick="typeKey('b')">b</button>
+          <button class="key" id="k-n" onclick="typeKey('n')">n</button>
+          <button class="key" id="k-m" onclick="typeKey('m')">m</button>
+          <button class="key fn wide" onclick="deleteLast()">⌫</button>
         </div>
-        <div class="key-row row4">
-          <button class="key fn num">123</button>
-          <button class="key fn globe">🌐</button>
-          <button class="key fn mic">🎤</button>
+        <div class="key-row">
+          <button class="key fn wider">123</button>
+          <button class="key fn" style="max-width:36px">🌐</button>
+          <button class="key fn" style="max-width:36px">🎤</button>
           <button class="key space" onclick="typeKey(' ')">space</button>
-          <button class="key fn return-key" onclick="typeKey('\n')">return</button>
+          <button class="key fn wider" onclick="typeKey('\n')">return</button>
         </div>
       </div>
-    </div>
 
-    <div class="home-indicator"><div class="home-bar"></div></div>
-  </div>
-</div>
+      <div class="home-indicator"><div class="home-bar"></div></div>
+    </div><!-- /keyboard -->
 
-<!-- More Options Sheet -->
+  </div><!-- /phone-inner -->
+</div><!-- /phone -->
+
+
+<!-- ── More Options overlay ─────────────────────────── -->
 <div class="overlay" id="moreOverlay" onclick="closeOverlay('moreOverlay')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -613,54 +528,94 @@
       <button class="sheet-done" onclick="closeOverlay('moreOverlay')">Done</button>
     </div>
 
-    <div class="sheet-section-title">Context</div>
-    <div class="context-bar">
-      <button class="ctx-chip active" onclick="setCtx(this,'General')">General</button>
-      <button class="ctx-chip" onclick="setCtx(this,'Email')">📧 Email</button>
-      <button class="ctx-chip" onclick="setCtx(this,'Chat')">💬 Chat</button>
-      <button class="ctx-chip" onclick="setCtx(this,'Social')">📱 Social</button>
-      <button class="ctx-chip" onclick="setCtx(this,'Professional')">👔 Professional</button>
-    </div>
+    <!-- Scrollable body -->
+    <div class="sheet-body">
 
-    <div class="sheet-section-title">Rewrite</div>
-    <div class="sheet-group">
-      <button class="sheet-item" onclick="sheetTransform('Rewrite')"><span class="sheet-item-icon">✍️</span><span class="sheet-item-label">Rewrite</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Paraphrase')"><span class="sheet-item-icon">🔄</span><span class="sheet-item-label">Paraphrase</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Fix Grammar')"><span class="sheet-item-icon">✅</span><span class="sheet-item-label">Fix Grammar</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Summarize')"><span class="sheet-item-icon">📝</span><span class="sheet-item-label">Summarize</span><span class="sheet-item-arrow">›</span></button>
-    </div>
+      <div class="sheet-section-title">Context</div>
+      <div class="ctx-row">
+        <button class="ctx-chip active" onclick="setCtx(this,'General')">General</button>
+        <button class="ctx-chip" onclick="setCtx(this,'Email')">📧 Email</button>
+        <button class="ctx-chip" onclick="setCtx(this,'Chat')">💬 Chat</button>
+        <button class="ctx-chip" onclick="setCtx(this,'Social')">📱 Social</button>
+        <button class="ctx-chip" onclick="setCtx(this,'Professional')">👔 Professional</button>
+      </div>
 
-    <div class="sheet-section-title">Tone</div>
-    <div class="sheet-group">
-      <button class="sheet-item" onclick="sheetTransform('Make Cooler')"><span class="sheet-item-icon">😎</span><span class="sheet-item-label">Make Cooler</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Make Formal')"><span class="sheet-item-icon">👔</span><span class="sheet-item-label">Make Formal</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Make Casual')"><span class="sheet-item-icon">👋</span><span class="sheet-item-label">Make Casual</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Shorten')"><span class="sheet-item-icon">✂️</span><span class="sheet-item-label">Shorten</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Expand')"><span class="sheet-item-icon">📖</span><span class="sheet-item-label">Expand</span><span class="sheet-item-arrow">›</span></button>
-    </div>
+      <div class="sheet-section-title">Rewrite</div>
+      <div class="sheet-group">
+        <button class="sheet-item" onclick="sheetTransform('Rewrite')">
+          <span class="item-icon">✍️</span><span class="item-label">Rewrite</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Paraphrase')">
+          <span class="item-icon">🔄</span><span class="item-label">Paraphrase</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Fix Grammar')">
+          <span class="item-icon">✅</span><span class="item-label">Fix Grammar</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Summarize')">
+          <span class="item-icon">📝</span><span class="item-label">Summarize</span><span class="item-arrow">›</span>
+        </button>
+      </div>
 
-    <div class="sheet-section-title">Context</div>
-    <div class="sheet-group">
-      <button class="sheet-item" onclick="sheetTransform('Email Reply')"><span class="sheet-item-icon">📧</span><span class="sheet-item-label">Reply to Email</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Chat Reply')"><span class="sheet-item-icon">💬</span><span class="sheet-item-label">Reply to Message</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Tweet')"><span class="sheet-item-icon">𝕏</span><span class="sheet-item-label">Tweet Format</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetTransform('Bullet Points')"><span class="sheet-item-icon">•</span><span class="sheet-item-label">Bullet Points</span><span class="sheet-item-arrow">›</span></button>
-    </div>
+      <div class="sheet-section-title">Tone</div>
+      <div class="sheet-group">
+        <button class="sheet-item" onclick="sheetTransform('Make Cooler')">
+          <span class="item-icon">😎</span><span class="item-label">Make Cooler</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Make Formal')">
+          <span class="item-icon">👔</span><span class="item-label">Make Formal</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Make Casual')">
+          <span class="item-icon">👋</span><span class="item-label">Make Casual</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Shorten')">
+          <span class="item-icon">✂️</span><span class="item-label">Shorten</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Expand')">
+          <span class="item-icon">📖</span><span class="item-label">Expand</span><span class="item-arrow">›</span>
+        </button>
+      </div>
 
-    <div class="sheet-section-title">Emojis</div>
-    <div class="sheet-group">
-      <button class="sheet-item" onclick="sheetEmojis('add')"><span class="sheet-item-icon">😊</span><span class="sheet-item-label">Add Emojis</span><span class="sheet-item-arrow">›</span></button>
-      <button class="sheet-item" onclick="sheetEmojis('suggest')"><span class="sheet-item-icon">🎯</span><span class="sheet-item-label">Suggest Emojis</span><span class="sheet-item-arrow">›</span></button>
-    </div>
+      <div class="sheet-section-title">Context</div>
+      <div class="sheet-group">
+        <button class="sheet-item" onclick="sheetTransform('Email Reply')">
+          <span class="item-icon">📧</span><span class="item-label">Reply to Email</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Chat Reply')">
+          <span class="item-icon">💬</span><span class="item-label">Reply to Message</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Tweet')">
+          <span class="item-icon">𝕏</span><span class="item-label">Tweet Format</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetTransform('Bullet Points')">
+          <span class="item-icon">•</span><span class="item-label">Bullet Points</span><span class="item-arrow">›</span>
+        </button>
+      </div>
 
-    <div class="sheet-section-title">Prompt</div>
-    <div class="sheet-group">
-      <button class="sheet-item" onclick="closeOverlay('moreOverlay'); setTimeout(showPrompt, 350)"><span class="sheet-item-icon">💡</span><span class="sheet-item-label">Custom Prompt…</span><span class="sheet-item-arrow">›</span></button>
+      <div class="sheet-section-title">Emojis</div>
+      <div class="sheet-group">
+        <button class="sheet-item" onclick="sheetEmoji('add')">
+          <span class="item-icon">😊</span><span class="item-label">Add Emojis to Text</span><span class="item-arrow">›</span>
+        </button>
+        <button class="sheet-item" onclick="sheetEmoji('suggest')">
+          <span class="item-icon">🎯</span><span class="item-label">Suggest Emojis</span><span class="item-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="sheet-section-title">Prompt</div>
+      <div class="sheet-group">
+        <button class="sheet-item" onclick="closeOverlay('moreOverlay'); setTimeout(()=>openSheet('promptOverlay',null), 320)">
+          <span class="item-icon">💡</span><span class="item-label">Custom Prompt…</span><span class="item-arrow">›</span>
+        </button>
+      </div>
+
+      <!-- bottom breathing room so iOS home bar doesn't block last item -->
+      <div style="height: 20px;"></div>
     </div>
   </div>
 </div>
 
-<!-- Custom Prompt Sheet -->
+
+<!-- ── Custom Prompt overlay ────────────────────────── -->
 <div class="overlay" id="promptOverlay" onclick="closeOverlay('promptOverlay')">
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
@@ -668,198 +623,205 @@
       <span class="sheet-title">Custom Prompt</span>
       <button class="sheet-done" onclick="applyPrompt()">Apply</button>
     </div>
-    <div style="padding: 12px 0 0;">
-      <p style="font-size:14px;color:#8e8e93;padding:0 16px 10px;">Describe what you want to do with your text:</p>
-      <div class="prompt-input-wrap">
-        <textarea class="prompt-textarea" id="promptInput" placeholder="e.g. Make it sound more confident…"></textarea>
+    <div class="sheet-body">
+      <div class="prompt-body">
+        <p class="prompt-hint">Describe what you want to do with your text:</p>
+        <textarea class="prompt-textarea" id="promptInput" rows="3"
+          placeholder="e.g. Make it sound more confident…"></textarea>
+        <p class="sug-title">Quick suggestions</p>
+        <div class="sug-row">
+          <button class="sug-chip" onclick="setSug('Translate to Spanish')">Translate to Spanish</button>
+          <button class="sug-chip" onclick="setSug('Sound like Shakespeare')">Sound like Shakespeare</button>
+          <button class="sug-chip" onclick="setSug('Add a call to action')">Add a call to action</button>
+          <button class="sug-chip" onclick="setSug('Make it more persuasive')">More persuasive</button>
+          <button class="sug-chip" onclick="setSug('Explain like I\'m 5')">Explain like I'm 5</button>
+          <button class="sug-chip" onclick="setSug('Add humor')">Add humor</button>
+          <button class="sug-chip" onclick="setSug('Convert to first person')">First person</button>
+          <button class="sug-chip" onclick="setSug('Make it rhyme')">Make it rhyme</button>
+        </div>
+        <button class="apply-btn" id="applyBtn" onclick="applyPrompt()">Apply Prompt</button>
       </div>
-      <div class="suggestions-title">Suggestions</div>
-      <div class="suggestions-row">
-        <button class="sug-chip" onclick="setSug(this)">Translate to Spanish</button>
-        <button class="sug-chip" onclick="setSug(this)">Sound like Shakespeare</button>
-        <button class="sug-chip" onclick="setSug(this)">Add a call to action</button>
-        <button class="sug-chip" onclick="setSug(this)">More persuasive</button>
-        <button class="sug-chip" onclick="setSug(this)">Explain like I'm 5</button>
-        <button class="sug-chip" onclick="setSug(this)">Add humor</button>
-      </div>
-      <button class="apply-btn" onclick="applyPrompt()">Apply Prompt</button>
+      <div style="height: 20px;"></div>
     </div>
   </div>
 </div>
 
+
 <script>
-  // ── State ────────────────────────────────────────────
-  let shifted = false;
-  let currentCtx = 'General';
-  const contexts = ['General','Email','Chat','Social','Professional'];
-  let ctxIndex = 0;
+// ── Data ──────────────────────────────────────────────
+const results = {
+  'Rewrite':      "Sounds great! I'll make sure to bring everything we need.",
+  'Paraphrase':   "That works perfectly for me — I'll have all the materials ready.",
+  'Fix Grammar':  "Yeah, sounds good! I'll bring everything.",
+  'Summarize':    "Confirmed — will attend and bring all required materials.",
+  'Make Cooler':  "Yooo absolutely, I got you — bringing the whole package 🔥",
+  'Make Formal':  "Certainly. I will ensure all necessary materials are prepared for the meeting.",
+  'Make Casual':  "Yep for sure! Got it all sorted 👌",
+  'Shorten':      "Sounds good, I'll bring everything.",
+  'Expand':       "Yeah, sounds good! I'll make sure to bring everything we need for the meeting, including the Q3 report and any other relevant materials.",
+  'Email Reply':  "Hi Sarah,\n\nThanks for the reminder. I'll be there at 3 PM tomorrow and will bring the Q3 report.\n\nBest,\nFaisal",
+  'Chat Reply':   "Yes! I'll be there at 3 and I've got the Q3 report ready 📊",
+  'Tweet':        "Meeting confirmed ✅ Bringing the Q3 report tomorrow at 3pm 📊 #teamwork #productivity",
+  'Bullet Points':"• Attending meeting at 3 PM tomorrow\n• Bringing Q3 report\n• Coffee beforehand — yes!",
+};
 
-  const textContent = document.getElementById('textContent');
-  const aiBar = document.getElementById('aiBar');
+const ctxCycle = ['General','Email','Chat','Social','Professional'];
+let ctxIdx = 0;
+let shifted = false;
 
-  const transformedTexts = {
-    'Rewrite': 'Sounds great! I'll make sure to bring everything we need.',
-    'Paraphrase': 'That works perfectly for me — I'll have all the materials ready.',
-    'Fix Grammar': 'Yeah, sounds good! I'll bring everything.',
-    'Summarize': 'Confirmed — will attend and bring all required materials.',
-    'Make Cooler': 'Yooo absolutely, I got you — bringing the whole package 🔥',
-    'Make Formal': 'Certainly. I will ensure all necessary materials are prepared for the meeting.',
-    'Make Casual': 'Yep for sure! Got it all sorted.',
-    'Shorten': "Sounds good, I'll bring everything.",
-    'Expand': "Yeah sounds good, I'll make sure to bring everything we need for the meeting, including the Q3 report and any other relevant documents.",
-    'Email Reply': "Dear Sarah,\n\nThank you for the reminder. I confirm my attendance at the 3 PM meeting tomorrow and will bring the Q3 report as requested.\n\nBest regards",
-    'Chat Reply': "Yes! I'll be there at 3 and will definitely bring the Q3 report 📊",
-    'Tweet': "Meeting confirmed ✅ Bringing the Q3 report tomorrow at 3pm! 📊 #teamwork",
-    'Bullet Points': "• Confirmed attendance for 3 PM meeting\n• Will bring Q3 report\n• Coffee beforehand works too",
-  };
-
-  // ── Tab states ───────────────────────────────────────
-  function setState(state) {
+// ── State management ──────────────────────────────────
+function setState(state, tab) {
+  // update tabs
+  if (tab) {
     document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
-    const tab = [...document.querySelectorAll('.state-tab')].find(t => t.textContent.toLowerCase().includes(state === 'default' ? 'default' : state));
-    if (tab) tab.classList.add('active');
-
-    aiBar.classList.remove('processing', 'emoji');
-    if (state === 'processing') {
-      aiBar.classList.add('processing');
-    } else if (state === 'emoji') {
-      aiBar.classList.add('emoji');
-    } else if (state === 'more') {
-      showMore();
-    } else if (state === 'prompt') {
-      showPrompt();
-    }
+    tab.classList.add('active');
   }
 
-  // ── Transforms ───────────────────────────────────────
-  function applyTransform(name) {
-    aiBar.classList.add('processing');
-    setTimeout(() => {
-      aiBar.classList.remove('processing');
-      const result = transformedTexts[name];
-      if (result) textContent.textContent = result;
-      // flash effect
-      textContent.style.color = '#007aff';
-      setTimeout(() => textContent.style.color = '', 500);
-    }, 1400);
-  }
+  const def  = document.getElementById('chipsDefault');
+  const proc = document.getElementById('processingRow');
+  const emoj = document.getElementById('emojiStrip');
+  const bar  = document.getElementById('aiBar');
 
-  function sheetTransform(name) {
-    closeOverlay('moreOverlay');
-    setTimeout(() => applyTransform(name), 380);
-  }
+  def.style.display  = 'none';
+  proc.style.display = 'none';
+  emoj.style.display = 'none';
+  bar.style.minHeight = '44px';
 
-  function sheetEmojis(mode) {
-    closeOverlay('moreOverlay');
-    setTimeout(() => {
-      if (mode === 'add') {
-        applyTransform('Add Emojis');
-      } else {
-        aiBar.classList.add('emoji');
-      }
-    }, 380);
+  if (state === 'default') {
+    def.style.display = 'flex';
+  } else if (state === 'processing') {
+    proc.style.display = 'flex';
+  } else if (state === 'emoji') {
+    emoj.style.display = 'flex';
+    bar.style.minHeight = '50px';
   }
+}
 
-  function insertEmoji(e) {
-    textContent.textContent += e;
-    aiBar.classList.remove('emoji');
+// ── Overlays ──────────────────────────────────────────
+function openSheet(id, tab) {
+  if (tab) {
+    document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
   }
+  document.getElementById(id).classList.add('open');
+}
+function closeOverlay(id) {
+  document.getElementById(id).classList.remove('open');
+  // revert state-tab to Default
+  document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.state-tab').classList.add('active');
+}
 
-  // ── Typing ───────────────────────────────────────────
-  function typeKey(k) {
-    if (k === '\n') return;
-    const char = shifted ? k.toUpperCase() : k;
-    if (k === ' ') {
-      textContent.textContent += ' ';
+// ── Transforms ────────────────────────────────────────
+function applyTransform(name) {
+  setState('processing', null);
+  document.getElementById('processingLabel').textContent = name + '…';
+  setTimeout(() => {
+    setState('default', null);
+    const r = results[name];
+    if (r) flashText(r);
+  }, 1400);
+}
+
+function sheetTransform(name) {
+  closeOverlay('moreOverlay');
+  setTimeout(() => applyTransform(name), 340);
+}
+
+function sheetEmoji(mode) {
+  closeOverlay('moreOverlay');
+  setTimeout(() => {
+    if (mode === 'add') {
+      setState('processing', null);
+      document.getElementById('processingLabel').textContent = 'Adding emojis…';
+      setTimeout(() => {
+        setState('default', null);
+        flashText(document.getElementById('textContent').textContent + ' 😊✅🎉');
+      }, 1400);
     } else {
-      textContent.textContent += char;
+      setState('emoji', null);
     }
-    if (shifted) {
-      shifted = false;
-      updateShiftKey();
-    }
-  }
+  }, 340);
+}
 
-  function deleteLast() {
-    const t = textContent.textContent;
-    if (t.length > 0) textContent.textContent = t.slice(0, -1);
-  }
+function insertEmoji(e) {
+  document.getElementById('textContent').textContent += e;
+  setState('default', null);
+}
 
-  function sendMessage() {
-    const t = textContent.textContent.trim();
-    if (!t) return;
-    const msgs = document.querySelector('.messages');
-    const b = document.createElement('div');
-    b.className = 'bubble sent';
-    b.textContent = t;
-    msgs.appendChild(b);
-    textContent.textContent = '';
-    msgs.scrollTop = msgs.scrollHeight;
-  }
+function flashText(text) {
+  const el = document.getElementById('textContent');
+  el.textContent = text;
+  el.style.color = '#007aff';
+  setTimeout(() => el.style.color = '', 600);
+}
 
-  // ── Shift ────────────────────────────────────────────
-  function toggleShift() {
-    shifted = !shifted;
-    updateShiftKey();
-  }
+// ── Typing ────────────────────────────────────────────
+function typeKey(k) {
+  if (k === '\n') return;
+  const el = document.getElementById('textContent');
+  el.textContent += shifted ? k.toUpperCase() : k;
+  if (shifted) { shifted = false; updateShift(); }
+}
+function deleteLast() {
+  const el = document.getElementById('textContent');
+  if (el.textContent.length > 0) el.textContent = el.textContent.slice(0,-1);
+}
+function sendMessage() {
+  const t = document.getElementById('textContent').textContent.trim();
+  if (!t) return;
+  const msgs = document.getElementById('messages');
+  const b = document.createElement('div');
+  b.className = 'bubble sent';
+  b.textContent = t;
+  msgs.appendChild(b);
+  document.getElementById('textContent').textContent = '';
+}
 
-  function updateShiftKey() {
-    const sk = document.getElementById('shiftKey');
-    sk.style.background = shifted ? '#fff' : '';
-    sk.style.color = shifted ? '#007aff' : '';
-    const letters = ['z','x','c','v','b','n','m'];
-    letters.forEach(l => {
-      const el = document.getElementById('k-' + l);
-      if (el) el.textContent = shifted ? l.toUpperCase() : l;
-    });
-  }
+// ── Shift ─────────────────────────────────────────────
+function toggleShift() {
+  shifted = !shifted;
+  updateShift();
+}
+function updateShift() {
+  const sk = document.getElementById('shiftKey');
+  sk.classList.toggle('active-shift', shifted);
+  ['z','x','c','v','b','n','m'].forEach(l => {
+    const el = document.getElementById('k-' + l);
+    if (el) el.textContent = shifted ? l.toUpperCase() : l;
+  });
+}
 
-  // ── Context cycling (for the bar chip) ──────────────
-  function cycleContext() {
-    ctxIndex = (ctxIndex + 1) % contexts.length;
-    currentCtx = contexts[ctxIndex];
-    document.getElementById('ctxLabel').textContent = currentCtx;
-  }
+// ── Context ───────────────────────────────────────────
+function cycleContext() {
+  ctxIdx = (ctxIdx + 1) % ctxCycle.length;
+  document.getElementById('ctxChip').textContent = '📍 ' + ctxCycle[ctxIdx];
+}
+function setCtx(el, name) {
+  document.querySelectorAll('.ctx-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ctxChip').textContent = '📍 ' + name;
+}
 
-  // ── Overlays ─────────────────────────────────────────
-  function showMore() {
-    document.getElementById('moreOverlay').classList.add('visible');
-  }
-  function showPrompt() {
-    document.getElementById('promptOverlay').classList.add('visible');
-  }
-  function closeOverlay(id) {
-    document.getElementById(id).classList.remove('visible');
-    // reset state tabs
-    document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.state-tab').classList.add('active');
-  }
+// ── Custom prompt ─────────────────────────────────────
+function setSug(text) {
+  document.getElementById('promptInput').value = text;
+}
+function applyPrompt() {
+  const val = document.getElementById('promptInput').value.trim();
+  closeOverlay('promptOverlay');
+  if (!val) return;
+  setState('processing', null);
+  document.getElementById('processingLabel').textContent = val + '…';
+  setTimeout(() => {
+    setState('default', null);
+    flashText('[Applied "' + val + '" — your text would be transformed here]');
+    document.getElementById('promptInput').value = '';
+  }, 1700);
+}
 
-  function setCtx(el, name) {
-    document.querySelectorAll('.ctx-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    currentCtx = name;
-    document.getElementById('ctxLabel').textContent = name;
-  }
-
-  // ── Custom prompt ────────────────────────────────────
-  function setSug(el) {
-    document.getElementById('promptInput').value = el.textContent;
-  }
-
-  function applyPrompt() {
-    const prompt = document.getElementById('promptInput').value.trim();
-    closeOverlay('promptOverlay');
-    if (!prompt) return;
-    aiBar.classList.add('processing');
-    setTimeout(() => {
-      aiBar.classList.remove('processing');
-      textContent.textContent = `[Applied: "${prompt}" to your text]`;
-      textContent.style.color = '#007aff';
-      setTimeout(() => textContent.style.color = '', 600);
-      document.getElementById('promptInput').value = '';
-    }, 1600);
-  }
+// Init
+setState('default', null);
 </script>
 </body>
 </html>
