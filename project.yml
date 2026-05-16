@@ -1,0 +1,74 @@
+# XcodeGen project spec
+# Run: xcodegen generate
+# This creates KeyboardAI.xcodeproj without needing to open Xcode manually.
+#
+# BEFORE GENERATING: replace every "com.yourdomain" with your actual reverse-domain
+# e.g.  com.faisal  →  com.faisal.keyboardai
+
+name: KeyboardAI
+
+options:
+  bundleIdPrefix: com.yourdomain
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  xcodeVersion: "16.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+    SWIFT_STRICT_CONCURRENCY: minimal
+
+# ── Targets ────────────────────────────────────────────────────────────────
+
+targets:
+
+  # ── 1. Container app ─────────────────────────────────────────────────────
+  KeyboardAI:
+    type: application
+    platform: iOS
+    sources:
+      - path: ios-keyboard-ai/MainApp
+        name: MainApp
+        excludes:
+          - "Info.plist"
+      - path: ios-keyboard-ai/Shared
+        name: Shared
+    settings:
+      base:
+        PRODUCT_NAME: KeyboardAI
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourdomain.keyboardai
+        INFOPLIST_FILE: ios-keyboard-ai/MainApp/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    entitlements:
+      path: ios-keyboard-ai/MainApp/KeyboardAI.entitlements
+    dependencies:
+      - target: KeyboardExtension
+        embed: true
+
+  # ── 2. Keyboard extension ─────────────────────────────────────────────────
+  KeyboardExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ios-keyboard-ai/KeyboardExtension
+        name: KeyboardExtension
+        excludes:
+          - "Info.plist"
+      - path: ios-keyboard-ai/Shared
+        name: Shared
+    settings:
+      base:
+        PRODUCT_NAME: KeyboardExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourdomain.keyboardai.keyboard
+        INFOPLIST_FILE: ios-keyboard-ai/KeyboardExtension/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "iPhone Developer"
+    entitlements:
+      path: ios-keyboard-ai/KeyboardExtension/KeyboardExtension.entitlements
